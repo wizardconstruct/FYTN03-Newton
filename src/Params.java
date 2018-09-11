@@ -17,5 +17,7 @@ public class Params {
 	public double c = 0.47;			// [-]
 	
 	public double y_0 = 2.0;		// [m]
+        
+        //Experiment
 
 }
