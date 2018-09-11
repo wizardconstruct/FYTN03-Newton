@@ -19,5 +19,8 @@ public class Params {
 	public double y_0 = 2.0;		// [m]
         
         //Experiment
-
+        
+        public double R = 15.08;                // [m]
+        public double maxHeight = 2.51;         // [m]
+        public double T = 16.67;                // [s]
 }
