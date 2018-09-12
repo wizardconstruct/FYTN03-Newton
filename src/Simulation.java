@@ -45,11 +45,13 @@ public class Simulation {
 		ball.setV_y(params.v_y_0);
 		ball.setY(params.y_0);
 		
+		// Second ball that moves with twice the step length for error calculation
 		Ball ball_2h = new Ball(params.m, params.r, params.Cd);
 		ball_2h.setV_x(params.v_x_0);
 		ball_2h.setV_y(params.v_y_0);
 		ball_2h.setY(params.y_0);
 
+		// Couldn't decide if this is for the ball or for the simulation object to keep track of
 		double B1 = 6.*Math.PI*params.eta*ball.getR()/ball.getM();
 		double B2 = 0.5*ball.getCd()*params.rho*ball.getA()/ball.getM();
 		if (!useResistance) {
@@ -60,14 +62,13 @@ public class Simulation {
 		}
 		
 		RungeKutta rk = new RungeKutta(B1, B2);
+		double error_x = 0;
+		double error_y = 0;
 
 		w.write("Time\tX position\tY position\t");
 		w.newLine();
 
-		int iteration = 0;
-		double error_x = 0;
-		double error_y = 0;
-		
+		int iteration = 0;		
 		while(ball.getY() > 0){
 			iteration++;
 			System.out.println("loop "+iteration);
@@ -106,6 +107,8 @@ public class Simulation {
 			double k4_y = params.h*(ball.getV_y()+k3_y);
 			double y = ball.getY()+k1_y/6+k2_y/3+k3_y/3+k4_y/6;
 
+			
+			// I changed a few things here that I think were mistakes? Might want to double and triple check that they are correct now
 			double k1_v_x = params.h*(-B1*ball.getV_x()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_x());
 			double k2_v_x = params.h*(-B1*(ball.getV_x()+k1_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k1_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k1_v_x/2));
 			double k3_v_x = params.h*(-B1*(ball.getV_x()+k2_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k2_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k2_v_x/2));
@@ -124,6 +127,7 @@ public class Simulation {
 			ball.setV_x(v_x);
 			ball.setV_y(v_y);
 			
+			// Every second iteration, record cumulative truncation error
 			if ((iteration % 2) == 0) {
 				ball_2h.setT(t);
 				ball_2h.setX(ball_2h.getX() + rk.step_x(ball_2h.getV_x(), 2*params.h));

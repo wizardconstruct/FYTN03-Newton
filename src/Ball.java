@@ -2,8 +2,6 @@
 
 public class Ball {
 
-	// The convention in Java is to set all variables private and use get() and set() methods, but we don't have to worry about these things in this small of a project
-
 	private double t = 0;
 	private double x = 0;
 	private double y = 0;
