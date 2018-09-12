@@ -4,28 +4,33 @@ public class Ball {
 
 	// The convention in Java is to set all variables private and use get() and set() methods, but we don't have to worry about these things in this small of a project
 
-	double t = 0;
-	double x = 0;
-	double y = 0;
-	double v_x = 0;
-	double v_y = 0;
-	double m = 0;
-	double r = 0;
+	private double t = 0;
+	private double x = 0;
+	private double y = 0;
+	private double v_x = 0;
+	private double v_y = 0;
+	private double m = 0;
+	private double r = 0;
+	private double A = 0;
+	private double Cd = 0;
 
-	/*
-        Todo: Add Cd, A and B2 as local variables?
-	 */
 
-	Params params = new Params();
-
+//	Params params = new Params();
+	
 	public Ball (double mass, double radius) {
-
-		this.m = params.m;
-		this.r = params.r;
-		/*
+		
 		this.m = mass;
 		this.r = radius;
-		 */
+		this.A = Math.PI*Math.pow(this.r, 2);
+		
+	}
+
+	public Ball (double mass, double radius, double drag) {
+
+		this.m = mass;
+		this.r = radius;
+		this.Cd = drag;
+		this.A = Math.PI*Math.pow(this.r, 2);
 
 	}
 
@@ -87,5 +92,22 @@ public class Ball {
 
 	public void setR(double r) {
 		this.r = r;
+		this.A = Math.PI*Math.pow(r, 2);
+	}
+
+	public double getCd() {
+		return this.Cd;
+	}
+
+	public void setCd(double Cd) {
+		this.Cd = Cd;
+	}
+
+	public double getA() {
+		return this.A;
+	}
+
+	public void setA(double A) {
+		this.A = A;
 	}
 }

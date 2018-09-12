@@ -6,11 +6,20 @@ import java.io.*;
 public class Simulation {
 	private Params params;
 	private boolean useResistance;
+	private boolean useB1;
 
 	public Simulation(boolean useResistance) {
 
 		this.params = new Params();
 		this.useResistance = useResistance;
+
+	};
+	
+	public Simulation(boolean useResistance, boolean useB1) {
+
+		this.params = new Params();
+		this.useResistance = useResistance;
+		this.useB1 = useB1;
 
 	};
 
@@ -19,14 +28,18 @@ public class Simulation {
 
 		String filename;
 		if(useResistance){
-			filename = "resistance.dat";
+			if (useB1) {
+				filename = "resistance.dat";
+			} else {
+				filename = "partialresistance.dat";
+			}
 		} else {
 			filename = "noresistance.dat";
 		}
 
 		BufferedWriter w = new BufferedWriter(new FileWriter(filename));
 
-		Ball ball = new Ball(params.m, params.r);
+		Ball ball = new Ball(params.m, params.r, params.Cd);
 		ball.setV_x(params.v_x_0);
 		ball.setV_y(params.v_y_0);
 		ball.setY(params.y_0);
@@ -71,21 +84,25 @@ public class Simulation {
 			double k4_y = params.h*(ball.getV_y()+k3_y);
 			double y = ball.getY()+k1_y/6+k2_y/3+k3_y/3+k4_y/6;
 
-			double B2 = params.B2;
+			double B1 = 6.*Math.PI*params.eta*ball.getR();
+			double B2 = 0.5*ball.getCd()*params.rho*ball.getA();
 			if (!useResistance) {
+				B1 = 0;
 				B2 = 0;
+			} else if (!useB1) {
+				B1 = 0;
 			}
 
-			double k1_v_x = params.h*-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_y()/ball.getM();
-			double k2_v_x = params.h*-B2*Math.sqrt(Math.pow(ball.getV_x()+k1_v_x/2, 2)+Math.pow(ball.getV_y()+k1_v_x/2, 2))*(ball.getV_y()+k1_v_x/2)/ball.getM();
-			double k3_v_x = params.h*-B2*Math.sqrt(Math.pow(ball.getV_x()+k2_v_x/2, 2)+Math.pow(ball.getV_y()+k2_v_x/2, 2))*(ball.getV_y()+k2_v_x/2)/ball.getM();
-			double k4_v_x = params.h*-B2*Math.sqrt(Math.pow(ball.getV_x()+k3_v_x, 2)+Math.pow(ball.getV_y()+k3_v_x, 2))*(ball.getV_y()+k3_v_x)/ball.getM();
+			double k1_v_x = params.h*(-B1*ball.getV_x()/ball.getM()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_y()/ball.getM());
+			double k2_v_x = params.h*(-B1*(ball.getV_x()+k1_v_x/2)/ball.getM()-B2*Math.sqrt(Math.pow(ball.getV_x()+k1_v_x/2, 2)+Math.pow(ball.getV_y()+k1_v_x/2, 2))*(ball.getV_y()+k1_v_x/2)/ball.getM());
+			double k3_v_x = params.h*(-B1*(ball.getV_x()+k2_v_x/2)/ball.getM()-B2*Math.sqrt(Math.pow(ball.getV_x()+k2_v_x/2, 2)+Math.pow(ball.getV_y()+k2_v_x/2, 2))*(ball.getV_y()+k2_v_x/2)/ball.getM());
+			double k4_v_x = params.h*(-B1*(ball.getV_x()+k3_v_x)/ball.getM()-B2*Math.sqrt(Math.pow(ball.getV_x()+k3_v_x, 2)+Math.pow(ball.getV_y()+k3_v_x, 2))*(ball.getV_y()+k3_v_x)/ball.getM());
 			double v_x = ball.getV_x()+k1_v_x/6+k2_v_x/3+k3_v_x/3+k4_v_x/6;
 
-			double k1_v_y = params.h*(-params.g-B2*Math.sqrt(Math.pow(ball.getV_y(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_y()/ball.getM());
-			double k2_v_y = params.h*(-params.g-B2*Math.sqrt(Math.pow(ball.getV_y()+k1_v_y/2, 2)+Math.pow(ball.getV_y()+k1_v_y/2, 2))*(ball.getV_y()+k1_v_y/2)/ball.getM());
-			double k3_v_y = params.h*(-params.g-B2*Math.sqrt(Math.pow(ball.getV_y()+k2_v_y/2, 2)+Math.pow(ball.getV_y()+k2_v_y/2, 2))*(ball.getV_y()+k2_v_y/2)/ball.getM());
-			double k4_v_y = params.h*(-params.g-B2*Math.sqrt(Math.pow(ball.getV_y()+k3_v_y, 2)+Math.pow(ball.getV_y()+k3_v_y, 2))*(ball.getV_y()+k3_v_y)/ball.getM());
+			double k1_v_y = params.h*(-B1*ball.getV_y()/ball.getM()-params.g-B2*Math.sqrt(Math.pow(ball.getV_y(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_y()/ball.getM());
+			double k2_v_y = params.h*(-B1*(ball.getV_y()+k1_v_y/2)/ball.getM()-params.g-B2*Math.sqrt(Math.pow(ball.getV_y()+k1_v_y/2, 2)+Math.pow(ball.getV_y()+k1_v_y/2, 2))*(ball.getV_y()+k1_v_y/2)/ball.getM());
+			double k3_v_y = params.h*(-B1*(ball.getV_y()+k2_v_y/2)/ball.getM()-params.g-B2*Math.sqrt(Math.pow(ball.getV_y()+k2_v_y/2, 2)+Math.pow(ball.getV_y()+k2_v_y/2, 2))*(ball.getV_y()+k2_v_y/2)/ball.getM());
+			double k4_v_y = params.h*(-B1*(ball.getV_y()+k3_v_y)/ball.getM()-params.g-B2*Math.sqrt(Math.pow(ball.getV_y()+k3_v_y, 2)+Math.pow(ball.getV_y()+k3_v_y, 2))*(ball.getV_y()+k3_v_y)/ball.getM());
 			double v_y = ball.getV_y()+k1_v_y/6+k2_v_y/3+k3_v_y/3+k4_v_y/6;
 
 			ball.setT(t);
