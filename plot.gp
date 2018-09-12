@@ -1,8 +1,17 @@
 reset
-set term png
-set output "plot.png"
-file = "out.dat"
-set termoption dash
-set linetype 2 dt 2
+set term post color enhanced solid
+set output "plot.eps"
+set samples 1000
+file1 = "resistance.dat"
+file2 = "noresistance.dat"
 
-plot file using 1:2 with points, \
+set key
+set xlabel "x"
+set ylabel "y"
+
+plot file1 using 2:3 with points title "Trajectory with air resistance", \
+ file2 using 2:3 with points title "Trajectory with no air resistance", \
+
+set term windows
+set out
+replot
