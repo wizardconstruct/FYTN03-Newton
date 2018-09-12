@@ -6,11 +6,15 @@ file1 = "resistance.dat"
 file2 = "noresistance.dat"
 
 set key
-set xlabel "x"
-set ylabel "y"
+set xlabel "x [m]"
+set ylabel "y [m]"
 
 plot file1 using 2:3 with points title "Trajectory with air resistance", \
  file2 using 2:3 with points title "Trajectory with no air resistance", \
+ 
+set term png
+set output "plot.png"
+replot
 
 set term windows
 set out

@@ -4,9 +4,9 @@ public class Params {
 	// Simulation
 
 	public double h = 1e-2;			// [s]
-	public double y_0 = 1.7;		// [m]
-	public double v_x_0 = 7.0; 		// Initial velocity in x
-	public double v_y_0 = 5.0;		// Initial velocity in y
+	public double y_0 = 0.1;		// [m]
+	public double v_x_0 = 11.0; 		// Initial velocity in x
+	public double v_y_0 = 7.0;		// Initial velocity in y
 
 	//Experiment
 
