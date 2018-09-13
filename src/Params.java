@@ -1,6 +1,7 @@
 
 public class Params {
-
+    
+//    v = 14.4233 	phi = 37.4667 	t = 1.6600 	R = 15.0797
 	// Simulation
 
 	public double h = 1e-2;			// [s]
