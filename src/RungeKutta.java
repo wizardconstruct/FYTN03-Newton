@@ -12,13 +12,13 @@ public class RungeKutta {
 		
 	}
 	
-	public double step_x(double v, double h) {
-		double k1 = h*v;
-		double k2 = h*(v+k1/2);
-		double k3 = h*(v+k2/2);
-		double k4 = h*(v+k3);
-		return k1/6+k2/3+k3/3+k4/6;
-	}
+//	public double step_x(double v, double h) {
+//		double k1 = h*v;
+//		double k2 = h*(v+k1/2);
+//		double k3 = h*(v+k2/2);
+//		double k4 = h*(v+k3);
+//		return k1/6+k2/3+k3/3+k4/6;
+//	}
 	
 	public double step_v(double v_a, double v_b, double a, double h) {
 		double k1 = h*(-a-B1*v_a-B2*Math.sqrt(Math.pow(v_b, 2)+Math.pow(v_a, 2))*v_a);

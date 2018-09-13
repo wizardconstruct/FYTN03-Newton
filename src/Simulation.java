@@ -95,17 +95,17 @@ public class Simulation {
 			// Runge-Kutta
 			double t = ball.getT()+params.h;
 
-			double k1_x = params.h*ball.getV_x();
-			double k2_x = params.h*(ball.getV_x()+k1_x/2);
-			double k3_x = params.h*(ball.getV_x()+k2_x/2);
-			double k4_x = params.h*(ball.getV_x()+k3_x);
-			double x = ball.getX()+k1_x/6+k2_x/3+k3_x/3+k4_x/6;
+//			double k1_x = params.h*ball.getV_x();
+//			double k2_x = params.h*(ball.getV_x()+k1_x/2);
+//			double k3_x = params.h*(ball.getV_x()+k2_x/2);
+//			double k4_x = params.h*(ball.getV_x()+k3_x);
+			double x = ball.getX()+params.h*ball.getV_x(); //k1_x/6+k2_x/3+k3_x/3+k4_x/6;
 
-			double k1_y = params.h*ball.getV_y();
-			double k2_y = params.h*(ball.getV_y()+k1_y/2);
-			double k3_y = params.h*(ball.getV_y()+k2_y/2);
-			double k4_y = params.h*(ball.getV_y()+k3_y);
-			double y = ball.getY()+k1_y/6+k2_y/3+k3_y/3+k4_y/6;
+//			double k1_y = params.h*ball.getV_y();
+//			double k2_y = params.h*(ball.getV_y()+k1_y/2);
+//			double k3_y = params.h*(ball.getV_y()+k2_y/2);
+//			double k4_y = params.h*(ball.getV_y()+k3_y);
+			double y = ball.getY()+params.h*ball.getV_y(); //k1_y/6+k2_y/3+k3_y/3+k4_y/6;
 
 			
 			// I changed a few things here that I think were mistakes? Might want to double and triple check that they are correct now
@@ -130,8 +130,8 @@ public class Simulation {
 			// Every second iteration, record cumulative truncation error
 			if ((iteration % 2) == 0) {
 				ball_2h.setT(t);
-				ball_2h.setX(ball_2h.getX() + rk.step_x(ball_2h.getV_x(), 2*params.h));
-				ball_2h.setY(ball_2h.getY() + rk.step_x(ball_2h.getV_y(), 2*params.h));
+				ball_2h.setX(ball_2h.getX() + ball_2h.getV_x()*2*params.h); //rk.step_x(ball_2h.getV_x(), 2*params.h));
+				ball_2h.setY(ball_2h.getY() + ball_2h.getV_y()*2*params.h); //rk.step_x(ball_2h.getV_y(), 2*params.h));
 				ball_2h.setV_x(ball_2h.getV_x() + rk.step_v(ball_2h.getV_x(), ball_2h.getV_y(), 0, 2*params.h));
 				ball_2h.setV_y(ball_2h.getV_y() + rk.step_v(ball_2h.getV_y(), ball_2h.getV_x(), params.g, 2*params.h));
 				error_x += Math.abs(ball.getX()-ball_2h.getX())/(Math.pow(2, 5)-1);

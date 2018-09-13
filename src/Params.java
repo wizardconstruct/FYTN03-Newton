@@ -5,8 +5,8 @@ public class Params {
 
 	public double h = 1e-2;			// [s]
 	public double y_0 = 0.1;		// [m]
-	public double v_x_0 = 10.5; 		// Initial velocity in x
-	public double v_y_0 = 7.5;		// Initial velocity in y
+	public double v_x_0 = 13.5; 		// Initial velocity in x
+	public double v_y_0 = 8.0;		// Initial velocity in y
 
 	//Experiment
 
