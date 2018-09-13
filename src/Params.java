@@ -5,8 +5,12 @@ public class Params {
 
 	public double h = 1e-2;			// [s]
 	public double y_0 = 0.1;		// [m]
-	public double v_x_0 = 13.5; 		// Initial velocity in x
-	public double v_y_0 = 8.0;		// Initial velocity in y
+	
+	public double v = 15.0;			// Initial velocity magnitude
+	public double phi = 30.0;		// Initial angle of trajectory
+	
+	public double v_x_0 = 0.0 + v*Math.cos(Math.PI*phi/180); 		// Initial velocity in x
+	public double v_y_0 = 0.0 + v*Math.sin(Math.PI*phi/180);		// Initial velocity in y
 
 	//Experiment
 
