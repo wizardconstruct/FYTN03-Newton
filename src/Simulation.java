@@ -49,12 +49,12 @@ public class Simulation {
 		ball.setV_x(v_start*Math.cos(Math.PI*phi/180));
 		ball.setV_y(v_start*Math.sin(Math.PI*phi/180));
 		ball.setY(params.y_0);
-		
-		// Second ball that moves with twice the step length for error calculation
-		Ball ball_2h = new Ball(params.m, params.r, params.Cd);
-		ball_2h.setV_x(v_start*Math.cos(Math.PI*phi/180));
-		ball_2h.setV_y(v_start*Math.sin(Math.PI*phi/180));
-		ball_2h.setY(params.y_0);
+		                
+                //Ball that moves with half the step length for error calculation
+                Ball ball_h = new Ball(params.m, params.r, params.Cd);
+		ball_h.setV_x(v_start*Math.cos(Math.PI*phi/180));
+		ball_h.setV_y(v_start*Math.sin(Math.PI*phi/180));
+                ball_h.setY(params.y_0);
 
 		// Couldn't decide if this is for the ball or for the simulation object to keep track of
 		double B1 = 6.*Math.PI*params.eta*ball.getR()/ball.getM();
@@ -79,52 +79,55 @@ public class Simulation {
 		while(ball.getY() > 0){
 			iteration++;
 //			System.out.println("loop "+iteration);
-			w.write(ball.getT()+"\t"+ball.getX()+"\t"+ball.getY()+"\t");
-			w.newLine();
-                        
-			double t = ball.getT()+params.h;
-			double x  = ball.getX()+params.h*ball.getV_x();
-			double y = ball.getY()+params.h*ball.getV_y();
-                        
-                        if(y>y_max){
-                            y_max = y;
+
+                        double t = ball.getT()+params.h/2;
+
+                        if ((iteration % 2) == 0) {
+                                w.write(ball.getT()+"\t"+ball.getX()+"\t"+ball.getY()+"\t");
+                                w.newLine();
+
+                                double x  = ball.getX()+params.h*ball.getV_x();
+                                double y = ball.getY()+params.h*ball.getV_y();
+
+                                if(y>y_max){
+                                    y_max = y;
+                                }
+
+                                // Runge-Kutta
+        //			double k1_v_x = params.h*(-B1*ball.getV_x()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_x());
+        //			double k2_v_x = params.h*(-B1*(ball.getV_x()+k1_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k1_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k1_v_x/2));
+        //			double k3_v_x = params.h*(-B1*(ball.getV_x()+k2_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k2_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k2_v_x/2));
+        //			double k4_v_x = params.h*(-B1*(ball.getV_x()+k3_v_x)-B2*Math.sqrt(Math.pow(ball.getV_x()+k3_v_x, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k3_v_x));
+        //			double v_x = ball.getV_x()+k1_v_x/6+k2_v_x/3+k3_v_x/3+k4_v_x/6;
+        //
+        //			double k1_v_y = params.h*(-params.g-B1*ball.getV_y()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_y());
+        //			double k2_v_y = params.h*(-params.g-B1*(ball.getV_y()+k1_v_y/2)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k1_v_y/2, 2))*(ball.getV_y()+k1_v_y/2));
+        //			double k3_v_y = params.h*(-params.g-B1*(ball.getV_y()+k2_v_y/2)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k2_v_y/2, 2))*(ball.getV_y()+k2_v_y/2));
+        //			double k4_v_y = params.h*(-params.g-B1*(ball.getV_y()+k3_v_y)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k3_v_y, 2))*(ball.getV_y()+k3_v_y));
+        //			double v_y = ball.getV_y()+k1_v_y/6+k2_v_y/3+k3_v_y/3+k4_v_y/6;
+
+                                double v_x = ball.getV_x()+rk.step_v(ball.getV_x(), ball.getV_y(), 0, params.h);
+                                double v_y = ball.getV_y()+rk.step_v(ball.getV_y(), ball.getV_x(), params.g, params.h);
+
+                                ball.setT(t);
+                                ball.setX(x);
+                                ball.setY(y);
+                                ball.setV_x(v_x);
+                                ball.setV_y(v_y);
                         }
-
-			// Runge-Kutta
-//			double k1_v_x = params.h*(-B1*ball.getV_x()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_x());
-//			double k2_v_x = params.h*(-B1*(ball.getV_x()+k1_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k1_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k1_v_x/2));
-//			double k3_v_x = params.h*(-B1*(ball.getV_x()+k2_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k2_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k2_v_x/2));
-//			double k4_v_x = params.h*(-B1*(ball.getV_x()+k3_v_x)-B2*Math.sqrt(Math.pow(ball.getV_x()+k3_v_x, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k3_v_x));
-//			double v_x = ball.getV_x()+k1_v_x/6+k2_v_x/3+k3_v_x/3+k4_v_x/6;
-//
-//			double k1_v_y = params.h*(-params.g-B1*ball.getV_y()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_y());
-//			double k2_v_y = params.h*(-params.g-B1*(ball.getV_y()+k1_v_y/2)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k1_v_y/2, 2))*(ball.getV_y()+k1_v_y/2));
-//			double k3_v_y = params.h*(-params.g-B1*(ball.getV_y()+k2_v_y/2)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k2_v_y/2, 2))*(ball.getV_y()+k2_v_y/2));
-//			double k4_v_y = params.h*(-params.g-B1*(ball.getV_y()+k3_v_y)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k3_v_y, 2))*(ball.getV_y()+k3_v_y));
-//			double v_y = ball.getV_y()+k1_v_y/6+k2_v_y/3+k3_v_y/3+k4_v_y/6;
-
-                        double v_x = ball.getV_x()+rk.step_v(ball.getV_x(), ball.getV_y(), 0, params.h);
-                        double v_y = ball.getV_y()+rk.step_v(ball.getV_y(), ball.getV_x(), params.g, params.h);
-
-			ball.setT(t);
-			ball.setX(x);
-			ball.setY(y);
-			ball.setV_x(v_x);
-			ball.setV_y(v_y);
-			
 			// Every second iteration, record cumulative truncation error
-			if ((iteration % 2) == 0) {
-				ball_2h.setT(t);
-				ball_2h.setX(ball_2h.getX() + ball_2h.getV_x()*2*params.h); //rk.step_x(ball_2h.getV_x(), 2*params.h));
-				ball_2h.setY(ball_2h.getY() + ball_2h.getV_y()*2*params.h); //rk.step_x(ball_2h.getV_y(), 2*params.h));
-				ball_2h.setV_x(ball_2h.getV_x() + rk.step_v(ball_2h.getV_x(), ball_2h.getV_y(), 0, 2*params.h));
-				ball_2h.setV_y(ball_2h.getV_y() + rk.step_v(ball_2h.getV_y(), ball_2h.getV_x(), params.g, 2*params.h));
-				error_x += Math.abs(ball.getX()-ball_2h.getX())/(Math.pow(2, 5)-1);
-				error_y += Math.abs(ball.getY()-ball_2h.getY())/(Math.pow(2, 5)-1);
-				
-				errorw.write(ball.getT()+"\t"+error_x+"\t"+error_y);
-				errorw.newLine();
-			}
+			
+                        ball_h.setT(t);
+                        ball_h.setX(ball_h.getX() + ball_h.getV_x()*params.h/2);
+                        ball_h.setY(ball_h.getY() + ball_h.getV_y()*params.h/2);
+                        ball_h.setV_x(ball_h.getV_x() + rk.step_v(ball_h.getV_x(), ball_h.getV_y(), 0, params.h/2));
+                        ball_h.setV_y(ball_h.getV_y() + rk.step_v(ball_h.getV_y(), ball_h.getV_x(), params.g, params.h/2));
+                        error_x += Math.abs(ball.getX()-ball_h.getX())/(Math.pow(2, 5)-1);
+                        error_y += Math.abs(ball.getY()-ball_h.getY())/(Math.pow(2, 5)-1);
+
+                        errorw.write(ball.getT()+"\t"+error_x+"\t"+error_y);
+                        errorw.newLine();
+			
 		}
 		w.close();
 		errorw.close();
