@@ -11,9 +11,6 @@ public class Ball {
 	private double r = 0;
 	private double A = 0;
 	private double Cd = 0;
-
-
-//	Params params = new Params();
 	
 	public Ball (double mass, double radius) {
 		
