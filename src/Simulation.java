@@ -7,48 +7,53 @@ public class Simulation {
 	private Params params;
 	private boolean useResistance;
 	private boolean useB1;
+        private double phi;
+        private double v_start;
+        private String name;
+        private double y_max;
 
-	public Simulation(boolean useResistance) {
-
-		this.params = new Params();
-		this.useResistance = useResistance;
+	public Simulation(boolean useResistance, double phi, double v_start) {
+            
+                this(useResistance, false, phi, v_start);
 
 	};
 	
-	public Simulation(boolean useResistance, boolean useB1) {
+	public Simulation(boolean useResistance, boolean useB1, double phi, double v_start) {
 
 		this.params = new Params();
 		this.useResistance = useResistance;
 		this.useB1 = useB1;
+                this.phi = phi;
+                this.v_start = v_start;
+                name = "_v"+v_start+"_phi"+phi;
 
 	};
 
 	public void run() throws IOException, FileNotFoundException{
-		System.out.println("running");
-
+		
 		String filename;
 		if(useResistance){
 			if (useB1) {
-				filename = "resistance.dat";
+				filename = "resistance"+name+".dat";
 			} else {
-				filename = "partialresistance.dat";
+				filename = "partialresistance"+name+".dat";
 			}
 		} else {
-			filename = "noresistance.dat";
+			filename = "noresistance"+name+".dat";
 		}
 
 		BufferedWriter w = new BufferedWriter(new FileWriter(filename));
 		BufferedWriter errorw = new BufferedWriter(new FileWriter("error_"+filename));
 
 		Ball ball = new Ball(params.m, params.r, params.Cd);
-		ball.setV_x(params.v_x_0);
-		ball.setV_y(params.v_y_0);
+		ball.setV_x(v_start*Math.cos(Math.PI*phi/180));
+		ball.setV_y(v_start*Math.sin(Math.PI*phi/180));
 		ball.setY(params.y_0);
 		
 		// Second ball that moves with twice the step length for error calculation
 		Ball ball_2h = new Ball(params.m, params.r, params.Cd);
-		ball_2h.setV_x(params.v_x_0);
-		ball_2h.setV_y(params.v_y_0);
+		ball_2h.setV_x(v_start*Math.cos(Math.PI*phi/180));
+		ball_2h.setV_y(v_start*Math.sin(Math.PI*phi/180));
 		ball_2h.setY(params.y_0);
 
 		// Couldn't decide if this is for the ball or for the simulation object to keep track of
@@ -68,58 +73,38 @@ public class Simulation {
 		w.write("Time\tX position\tY position\t");
 		w.newLine();
 
+                y_max = 0;
+                
 		int iteration = 0;		
 		while(ball.getY() > 0){
 			iteration++;
-			System.out.println("loop "+iteration);
+//			System.out.println("loop "+iteration);
 			w.write(ball.getT()+"\t"+ball.getX()+"\t"+ball.getY()+"\t");
 			w.newLine();
-
-			/*
-                    //Euler
-                    // Calculate new values
-                    double t = ball.getT()+params.h;
-                    double x = ball.getX()+params.h*ball.getV_x();
-                    double y = ball.getY()+params.h*ball.getV_y();
-                    double v_x = ball.getV_x()-params.h*params.B2*ball.getV()*ball.getV_y()/ball.getM();
-                    double v_y = ball.getV_y()-params.h*params.g-params.h*params.B2*ball.getV()*ball.getV_y()/ball.getM();
-
-                    // Set new values
-                    ball.setT(t);
-                    ball.setX(x);
-                    ball.setY(y);
-                    ball.setV_x(v_x);
-                    ball.setV_y(v_y);
-			 */
+                        
+			double t = ball.getT()+params.h;
+			double x  = ball.getX()+params.h*ball.getV_x();
+			double y = ball.getY()+params.h*ball.getV_y();
+                        
+                        if(y>y_max){
+                            y_max = y;
+                        }
 
 			// Runge-Kutta
-			double t = ball.getT()+params.h;
+//			double k1_v_x = params.h*(-B1*ball.getV_x()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_x());
+//			double k2_v_x = params.h*(-B1*(ball.getV_x()+k1_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k1_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k1_v_x/2));
+//			double k3_v_x = params.h*(-B1*(ball.getV_x()+k2_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k2_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k2_v_x/2));
+//			double k4_v_x = params.h*(-B1*(ball.getV_x()+k3_v_x)-B2*Math.sqrt(Math.pow(ball.getV_x()+k3_v_x, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k3_v_x));
+//			double v_x = ball.getV_x()+k1_v_x/6+k2_v_x/3+k3_v_x/3+k4_v_x/6;
+//
+//			double k1_v_y = params.h*(-params.g-B1*ball.getV_y()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_y());
+//			double k2_v_y = params.h*(-params.g-B1*(ball.getV_y()+k1_v_y/2)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k1_v_y/2, 2))*(ball.getV_y()+k1_v_y/2));
+//			double k3_v_y = params.h*(-params.g-B1*(ball.getV_y()+k2_v_y/2)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k2_v_y/2, 2))*(ball.getV_y()+k2_v_y/2));
+//			double k4_v_y = params.h*(-params.g-B1*(ball.getV_y()+k3_v_y)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k3_v_y, 2))*(ball.getV_y()+k3_v_y));
+//			double v_y = ball.getV_y()+k1_v_y/6+k2_v_y/3+k3_v_y/3+k4_v_y/6;
 
-//			double k1_x = params.h*ball.getV_x();
-//			double k2_x = params.h*(ball.getV_x()+k1_x/2);
-//			double k3_x = params.h*(ball.getV_x()+k2_x/2);
-//			double k4_x = params.h*(ball.getV_x()+k3_x);
-			double x = ball.getX()+params.h*ball.getV_x(); //k1_x/6+k2_x/3+k3_x/3+k4_x/6;
-
-//			double k1_y = params.h*ball.getV_y();
-//			double k2_y = params.h*(ball.getV_y()+k1_y/2);
-//			double k3_y = params.h*(ball.getV_y()+k2_y/2);
-//			double k4_y = params.h*(ball.getV_y()+k3_y);
-			double y = ball.getY()+params.h*ball.getV_y(); //k1_y/6+k2_y/3+k3_y/3+k4_y/6;
-
-			
-			// I changed a few things here that I think were mistakes? Might want to double and triple check that they are correct now
-			double k1_v_x = params.h*(-B1*ball.getV_x()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_x());
-			double k2_v_x = params.h*(-B1*(ball.getV_x()+k1_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k1_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k1_v_x/2));
-			double k3_v_x = params.h*(-B1*(ball.getV_x()+k2_v_x/2)-B2*Math.sqrt(Math.pow(ball.getV_x()+k2_v_x/2, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k2_v_x/2));
-			double k4_v_x = params.h*(-B1*(ball.getV_x()+k3_v_x)-B2*Math.sqrt(Math.pow(ball.getV_x()+k3_v_x, 2)+Math.pow(ball.getV_y(), 2))*(ball.getV_x()+k3_v_x));
-			double v_x = ball.getV_x()+k1_v_x/6+k2_v_x/3+k3_v_x/3+k4_v_x/6;
-
-			double k1_v_y = params.h*(-params.g-B1*ball.getV_y()-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y(), 2))*ball.getV_y());
-			double k2_v_y = params.h*(-params.g-B1*(ball.getV_y()+k1_v_y/2)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k1_v_y/2, 2))*(ball.getV_y()+k1_v_y/2));
-			double k3_v_y = params.h*(-params.g-B1*(ball.getV_y()+k2_v_y/2)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k2_v_y/2, 2))*(ball.getV_y()+k2_v_y/2));
-			double k4_v_y = params.h*(-params.g-B1*(ball.getV_y()+k3_v_y)-B2*Math.sqrt(Math.pow(ball.getV_x(), 2)+Math.pow(ball.getV_y()+k3_v_y, 2))*(ball.getV_y()+k3_v_y));
-			double v_y = ball.getV_y()+k1_v_y/6+k2_v_y/3+k3_v_y/3+k4_v_y/6;
+                        double v_x = ball.getV_x()+rk.step_v(ball.getV_x(), ball.getV_y(), 0, params.h);
+                        double v_y = ball.getV_y()+rk.step_v(ball.getV_y(), ball.getV_x(), params.g, params.h);
 
 			ball.setT(t);
 			ball.setX(x);
@@ -143,6 +128,7 @@ public class Simulation {
 		}
 		w.close();
 		errorw.close();
+                System.out.println("v = "+v_start+", phi = "+phi+", t = "+ball.getT()+", y = "+y_max);
 	}
 
 }
