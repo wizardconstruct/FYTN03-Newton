@@ -128,7 +128,8 @@ public class Simulation {
 		}
 		w.close();
 		errorw.close();
-                System.out.println("v = "+v_start+", phi = "+phi+", t = "+ball.getT()+", y = "+y_max);
+//                System.out.println("v = "+v_start+"\tphi = "+phi+"\tt = "+ball.getT()+"\ty = "+y_max);
+                System.out.format("v = %.4f \tphi = %.4f \tt = %.4f \tR = %.4f%n", v_start, phi, ball.getT(),ball.getX());
 	}
 
 }
