@@ -29,21 +29,30 @@ public class Simulation {
 
 	};
 
-	public void run() throws IOException, FileNotFoundException{
-		
-		String filename;
-		if(useResistance){
-			if (useB1) {
-				filename = "resistance"+name+".dat";
-			} else {
-				filename = "partialresistance"+name+".dat";
-			}
-		} else {
-			filename = "noresistance"+name+".dat";
-		}
+	public Simulation(boolean useResistance, boolean useB1, double phi, double v_start, double h) {
+		this.params = new Params();
+		this.useResistance = useResistance;
+		this.useB1 = useB1;
+                this.phi = phi;
+                this.v_start = v_start;
+                this.params.h = h;
+	}
 
-		BufferedWriter w = new BufferedWriter(new FileWriter(filename));
-		BufferedWriter errorw = new BufferedWriter(new FileWriter("error_"+filename));
+	public double run() throws IOException, FileNotFoundException{
+		
+//		String filename;
+//		if(useResistance){
+//			if (useB1) {
+//				filename = "resistance"+name+".dat";
+//			} else {
+//				filename = "partialresistance"+name+".dat";
+//			}
+//		} else {
+//			filename = "noresistance"+name+".dat";
+//		}
+
+//		BufferedWriter w = new BufferedWriter(new FileWriter(filename));
+//		BufferedWriter errorw = new BufferedWriter(new FileWriter("error_"+filename));
 
 		Ball ball = new Ball(params.m, params.r, params.Cd);
 		ball.setV_x(v_start*Math.cos(Math.PI*phi/180));
@@ -70,8 +79,8 @@ public class Simulation {
 		double error_x = 0;
 		double error_y = 0;
 
-		w.write("Time\tX position\tY position\t");
-		w.newLine();
+//		w.write("Time\tX position\tY position\t");
+//		w.newLine();
 
                 y_max = 0;
                 
@@ -79,8 +88,8 @@ public class Simulation {
 		while(ball.getY() > 0){
 			iteration++;
 //			System.out.println("loop "+iteration);
-			w.write(ball.getT()+"\t"+ball.getX()+"\t"+ball.getY()+"\t");
-			w.newLine();
+//			w.write(ball.getT()+"\t"+ball.getX()+"\t"+ball.getY()+"\t");
+//			w.newLine();
                         
 			double t = ball.getT()+params.h;
 			double x  = ball.getX()+params.h*ball.getV_x();
@@ -112,24 +121,26 @@ public class Simulation {
 			ball.setV_x(v_x);
 			ball.setV_y(v_y);
 			
-			// Every second iteration, record cumulative truncation error
+			// Every second iteration, record truncation error of the step
 			if ((iteration % 2) == 0) {
 				ball_2h.setT(t);
 				ball_2h.setX(ball_2h.getX() + ball_2h.getV_x()*2*params.h); //rk.step_x(ball_2h.getV_x(), 2*params.h));
 				ball_2h.setY(ball_2h.getY() + ball_2h.getV_y()*2*params.h); //rk.step_x(ball_2h.getV_y(), 2*params.h));
 				ball_2h.setV_x(ball_2h.getV_x() + rk.step_v(ball_2h.getV_x(), ball_2h.getV_y(), 0, 2*params.h));
 				ball_2h.setV_y(ball_2h.getV_y() + rk.step_v(ball_2h.getV_y(), ball_2h.getV_x(), params.g, 2*params.h));
-				error_x += Math.abs(ball.getX()-ball_2h.getX())/(Math.pow(2, 5)-1);
-				error_y += Math.abs(ball.getY()-ball_2h.getY())/(Math.pow(2, 5)-1);
+				error_x = Math.abs(ball.getX()-ball_2h.getX())/(Math.pow(2, 5)-1);
+				error_y = Math.abs(ball.getY()-ball_2h.getY())/(Math.pow(2, 5)-1);
 				
-				errorw.write(ball.getT()+"\t"+error_x+"\t"+error_y);
-				errorw.newLine();
+//				errorw.write(ball.getT()+"\t"+error_x+"\t"+error_y);
+//				errorw.newLine();
 			}
 		}
-		w.close();
-		errorw.close();
+//		w.close();
+//		errorw.close();
 //                System.out.println("v = "+v_start+"\tphi = "+phi+"\tt = "+ball.getT()+"\ty = "+y_max);
-                System.out.format("v = %.4f \tphi = %.4f \tt = %.4f \tR = %.4f%n", v_start, phi, ball.getT(),ball.getX());
+                System.out.format("v = %.4f \tphi = %.4f \tt = %.4f \tR = %.4f\ty = %.4f%n", v_start, phi, ball.getT(),ball.getX(), y_max);
+                
+                return error_y;
 	}
 
 }
