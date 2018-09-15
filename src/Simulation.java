@@ -7,26 +7,26 @@ public class Simulation {
 	private Params params;
 	private boolean useResistance;
 	private boolean useB1;
+	private double B1;
+	private double B2;
 	private double phi;
 	private double v_start;
-	private String name;
 	private double y_max;
+	private double error_x;
+	private double error_y;
+	private String name;
 
 	public Simulation(boolean useResistance, double phi, double v_start) {
-
 		this(useResistance, false, phi, v_start);
-
 	};
 
 	public Simulation(boolean useResistance, boolean useB1, double phi, double v_start) {
-
 		this.params = new Params();
 		this.useResistance = useResistance;
 		this.useB1 = useB1;
 		this.phi = phi;
 		this.v_start = v_start;
-		name = "_v"+v_start+"_phi"+phi;
-
+		this.name = "_v"+v_start+"_phi"+phi;
 	};
 
 	public void run() throws IOException, FileNotFoundException{
@@ -57,8 +57,8 @@ public class Simulation {
 		ball_2h.setY(params.y_0);
 
 		// Couldn't decide if this is for the ball or for the simulation object to keep track of
-		double B1 = 6.*Math.PI*params.eta*ball.getR()/ball.getM();
-		double B2 = 0.5*ball.getCd()*params.rho*ball.getA()/ball.getM();
+		B1 = 6.*Math.PI*params.eta*ball.getR()/ball.getM();
+		B2 = 0.5*ball.getCd()*params.rho*ball.getA()/ball.getM();
 		if (!useResistance) {
 			B1 = 0;
 			B2 = 0;
@@ -67,8 +67,6 @@ public class Simulation {
 		}
 
 		RungeKutta rk = new RungeKutta(B1, B2);
-		double error_x = 0;
-		double error_y = 0;
 
 		w.write("Time\tX position\tY position\t");
 		w.newLine();
@@ -89,7 +87,6 @@ public class Simulation {
 				y_max = y;
 			}
 
-
 			double v_x = ball.getV_x()+rk.step_v(ball.getV_x(), ball.getV_y(), 0, params.h);
 			double v_y = ball.getV_y()+rk.step_v(ball.getV_y(), ball.getV_x(), params.g, params.h);
 
@@ -99,15 +96,15 @@ public class Simulation {
 			ball.setV_x(v_x);
 			ball.setV_y(v_y);
 
-			// Every second iteration, record cumulative truncation error
+			// Every second iteration, record truncation error
 			if ((iteration % 2) == 0) {
 				ball_2h.setT(t);
 				ball_2h.setX(ball_2h.getX() + ball_2h.getV_x()*2*params.h); 
 				ball_2h.setY(ball_2h.getY() + ball_2h.getV_y()*2*params.h); 
 				ball_2h.setV_x(ball_2h.getV_x() + rk.step_v(ball_2h.getV_x(), ball_2h.getV_y(), 0, 2*params.h));
 				ball_2h.setV_y(ball_2h.getV_y() + rk.step_v(ball_2h.getV_y(), ball_2h.getV_x(), params.g, 2*params.h));
-				error_x += Math.abs(ball.getX()-ball_2h.getX())/(Math.pow(2, 5)-1);
-				error_y += Math.abs(ball.getY()-ball_2h.getY())/(Math.pow(2, 5)-1);
+				error_x = Math.abs(ball.getX()-ball_2h.getX())/(Math.pow(2, 5)-1);
+				error_y = Math.abs(ball.getY()-ball_2h.getY())/(Math.pow(2, 5)-1);
 
 				errorw.write(ball.getT()+"\t"+error_x+"\t"+error_y);
 				errorw.newLine();

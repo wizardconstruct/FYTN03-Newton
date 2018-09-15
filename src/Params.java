@@ -23,7 +23,7 @@ public class Params {
 	// Constants
 
 	public double g = 9.81; 		// [m/s]
-	public double eta = 1.8e-5;             // [kg/(m*s)]
+	public double eta = 1.8e-5;		// [kg/(m*s)]
 	public double rho = 1.2;		// [kg/m^3]        
 	public double Cd = 0.13;		// Used this as source https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3657093/
 }

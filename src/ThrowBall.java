@@ -1,8 +1,5 @@
 import java.io.*;
 
-
-
-
 public class ThrowBall {
 
 	public static void main(String[] arg){
@@ -38,7 +35,7 @@ public class ThrowBall {
 			System.out.println("");
 		}
 		/*
-                Params params = new Params();
+        Params params = new Params();
 		Simulation sim_resist = new Simulation(true, true, params.phi, params.v);				// Simulate with B1 and B2
 		Simulation sim_partialresist = new Simulation(true, false, params.phi, params.v);                     // Simulate with B2 but no B1
 		Simulation sim_noresist = new Simulation(false, params.phi, params.v);				// Simulate with neither one

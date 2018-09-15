@@ -5,11 +5,9 @@ public class RungeKutta {
 	private double B1 = 0;
 	private double B2 = 0;
 
-	public RungeKutta(double B1, double B2) {
-
+	public RungeKutta(double B1, double B2) {		
 		this.B1 = B1;
-		this.B2 = B2;
-
+		this.B2 = B2;		
 	}
 
 	public double step_v(double v_a, double v_b, double a, double h) {

@@ -13,20 +13,16 @@ public class Ball {
 	private double Cd = 0;
 
 	public Ball (double mass, double radius) {
-
 		this.m = mass;
 		this.r = radius;
 		this.A = Math.PI*Math.pow(this.r, 2);
-
 	}
 
 	public Ball (double mass, double radius, double drag) {
-
 		this.m = mass;
 		this.r = radius;
 		this.Cd = drag;
 		this.A = Math.PI*Math.pow(this.r, 2);
-
 	}
 
 	public double getV(){
